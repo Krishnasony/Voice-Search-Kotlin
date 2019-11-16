@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Voice Search</string>
+    <string name="mic_description">Tap on mic to speak</string>
+</resources>
