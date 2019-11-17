@@ -34,7 +34,7 @@ class SearchView : androidx.appcompat.widget.AppCompatEditText {
 
         this.isLongClickable = false
 
-        this.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_accent, 0,0 , 0)
+        this.setCompoundDrawablesWithIntrinsicBounds(0, 0,R.drawable.ic_search_accent , 0)
         this.hint = "Search Here ..."
         this.setPadding(
             getPx(context, 16),
