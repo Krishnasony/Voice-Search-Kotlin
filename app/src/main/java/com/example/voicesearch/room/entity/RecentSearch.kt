@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.voicesearch.utils.currentDate
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "recent_search")
@@ -15,4 +16,9 @@ data class RecentSearch(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "primaryKey")
     var primaryKey: Int = 0
+
+    constructor():this(
+        search = "",
+        searchDate = currentDate
+    )
 }

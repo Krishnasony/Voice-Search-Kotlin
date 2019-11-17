@@ -9,4 +9,8 @@ class RecentSearchRepo(var dao: SearchDao) {
     suspend fun insertSearch(recentSearch: RecentSearch) = withContext(Dispatchers.IO){
         dao.insertSearchData(recentSearch)
     }
+
+    suspend fun getRecentSearchData(search:String) = withContext(Dispatchers.IO){
+        dao.getRecentSearchData(search)
+    }
 }

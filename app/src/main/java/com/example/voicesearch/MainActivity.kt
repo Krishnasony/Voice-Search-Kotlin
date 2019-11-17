@@ -13,8 +13,12 @@ import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.voicesearch.adapter.RecentSearchAdapter
 import com.example.voicesearch.room.entity.RecentSearch
 import com.example.voicesearch.utils.currentDate
+import com.example.voicesearch.utils.observeOnce
 import com.example.voicesearch.utils.showToast
 import com.example.voicesearch.viewModel.RecentSearchViewModel
 import com.example.voicesearch.voiceHelper.SpeechCallback
@@ -29,6 +33,7 @@ import java.util.ArrayList
 class MainActivity : AppCompatActivity() {
     private val mViewModel:RecentSearchViewModel by viewModel()
     private lateinit var mVoiceRecognizerHelper : VoiceRecognizerHelper
+    private var adapter:RecentSearchAdapter ?= null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -74,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             override fun onSpeechResult(result: ArrayList<String>?) {
                 Log.d(TAG, "Speech Result : ${result.toString()}")
                 floating_action_btn.setImageResource(R.drawable.ic_mic_none)
+                getRecentSearchData()
                 searchView.setText(result!![0])
             }
 
@@ -85,6 +91,29 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun getRecentSearchData() {
+        val search = searchView.text.toString()
+        if (search.isNotEmpty()) {
+            GlobalScope.launch(Dispatchers.Main) {
+                mViewModel.getRecentSearchData(search)
+                mViewModel.recentSearchLiveData?.observeOnce(this@MainActivity, Observer {
+                    list->
+                    list?.let {
+                        setDataToRecyclerView(it)
+                    }
+                })
+            }
+        }
+    }
+
+    private fun setDataToRecyclerView(it: List<RecentSearch>) {
+        rv_recent_search.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
+        adapter = RecentSearchAdapter(it,this)
+        rv_recent_search.adapter = adapter
+        adapter!!.notifyDataSetChanged()
+    }
+
     private fun hasAudioRecordingPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
