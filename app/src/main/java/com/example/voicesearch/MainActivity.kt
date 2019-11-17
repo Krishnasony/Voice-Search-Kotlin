@@ -34,12 +34,13 @@ class MainActivity : AppCompatActivity() {
     private val mViewModel:RecentSearchViewModel by viewModel()
     private lateinit var mVoiceRecognizerHelper : VoiceRecognizerHelper
     private var adapter:RecentSearchAdapter ?= null
+    private var listOfData:List<RecentSearch> = arrayListOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setDataToRecyclerView(listOfData)
         initVoiceRecognizationDialog()
         onClick()
-
     }
 
     private fun onClick() {
@@ -54,9 +55,7 @@ class MainActivity : AppCompatActivity() {
         searchView.setOnSearchButtonClickListener(View.OnClickListener {
             val searchText = searchView.text.toString()
             if (searchText.isNotEmpty()){
-                GlobalScope.launch(Dispatchers.IO) {
-                    mViewModel.addRecentSearch(recentSearch = RecentSearch(search = searchText,searchDate = currentDate))
-                }
+                getRecentSearchData()
             }else{
                 this.showToast("Say something on mic for search!")
             }
@@ -68,25 +67,28 @@ class MainActivity : AppCompatActivity() {
     private fun initVoiceRecognizationDialog() {
         mVoiceRecognizerHelper = VoiceRecognizerHelper(this, object : SpeechCallback {
             override fun onSpeechStart() {
+                searchView.setText("")
                 floating_action_btn.setImageResource(R.drawable.ic_mic)
                 voice_state.text = getString(R.string.listening)
             }
 
             override fun onSpeechStop() {
                 floating_action_btn.setImageResource(R.drawable.ic_mic_none)
+                voice_state.text = ""
+                voice_state.text = STOP
+
             }
 
             override fun onSpeechResult(result: ArrayList<String>?) {
                 Log.d(TAG, "Speech Result : ${result.toString()}")
                 floating_action_btn.setImageResource(R.drawable.ic_mic_none)
-                getRecentSearchData()
                 searchView.setText(result!![0])
             }
 
             override fun onSpeechError(message: String) {
                 Log.d(TAG, "Speech Error : $message")
                 floating_action_btn.setImageResource(R.drawable.ic_mic_off)
-                voice_state.text = STOP
+                voice_state.text = message
 
             }
         })
@@ -96,14 +98,29 @@ class MainActivity : AppCompatActivity() {
         val search = searchView.text.toString()
         if (search.isNotEmpty()) {
             GlobalScope.launch(Dispatchers.Main) {
-                mViewModel.getRecentSearchData(search)
+                mViewModel.getRecentSearchData(searchString = "%$search%")
                 mViewModel.recentSearchLiveData?.observeOnce(this@MainActivity, Observer {
                     list->
-                    list?.let {
-                        setDataToRecyclerView(it)
+                    list?.let {dataList->
+                        listOfData = dataList
+                        setDataToRecyclerView(listOfData)
+                        if (dataList.isNotEmpty()){
+                            val data =  listOfData.filter { data -> data.search != search }
+                            if (data.isEmpty()){
+                                addSearchData(search)
+                            }
+                        }else{
+                            addSearchData(search)
+                        }
                     }
                 })
             }
+        }
+    }
+
+    private fun addSearchData(search: String) {
+        GlobalScope.launch (Dispatchers.IO){
+            mViewModel.addRecentSearch(recentSearch = RecentSearch(search = search,searchDate = currentDate))
         }
     }
 

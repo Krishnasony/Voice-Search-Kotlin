@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatEditText
+import com.example.voicesearch.MainActivity
 import com.example.voicesearch.R
 import com.example.voicesearch.room.entity.RecentSearch
 
@@ -22,14 +24,18 @@ class RecentSearchAdapter(var searchItem:List<RecentSearch>, var context: Contex
     }
 
     override fun onBindViewHolder(p0: RecentSearchListViewHolder, p1: Int) {
-        p0.bind(searchItem[p1])
+        p0.bind(searchItem[p1],context)
         p0.setIsRecyclable(false)
     }
 
     class RecentSearchListViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView){
-        fun bind( searchItem: RecentSearch) {
-            val itemView = itemView.findViewById<TextView>(R.id.tv_recent_search)
-            itemView.text  = searchItem.search
+        fun bind( searchItem: RecentSearch,
+                  context: Context) {
+            val view = itemView.findViewById<TextView>(R.id.tv_recent_search)
+            view.text  = searchItem.search
+            itemView.setOnClickListener {
+                (context as MainActivity).findViewById<AppCompatEditText>(R.id.searchView).setText(searchItem.search)
+            }
         }
 
     }
