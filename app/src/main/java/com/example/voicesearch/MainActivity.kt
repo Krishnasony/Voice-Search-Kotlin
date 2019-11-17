@@ -10,15 +10,24 @@ import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import com.example.voicesearch.room.entity.RecentSearch
+import com.example.voicesearch.utils.currentDate
 import com.example.voicesearch.utils.showToast
+import com.example.voicesearch.viewModel.RecentSearchViewModel
 import com.example.voicesearch.voiceHelper.SpeechCallback
 import com.example.voicesearch.voiceHelper.VoiceRecognizerHelper
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.koin.android.viewmodel.ext.android.viewModel
 import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
+    private val mViewModel:RecentSearchViewModel by viewModel()
     private lateinit var mVoiceRecognizerHelper : VoiceRecognizerHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +45,18 @@ class MainActivity : AppCompatActivity() {
                 requestAudioRecordingPermission()
             }
         }
+
+        searchView.setOnSearchButtonClickListener(View.OnClickListener {
+            val searchText = searchView.text.toString()
+            if (searchText.isNotEmpty()){
+                GlobalScope.launch(Dispatchers.IO) {
+                    mViewModel.addRecentSearch(recentSearch = RecentSearch(search = searchText,searchDate = currentDate))
+                }
+            }else{
+                this.showToast("Say something on mic for search!")
+            }
+
+        })
 
     }
 
