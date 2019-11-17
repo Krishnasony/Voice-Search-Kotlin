@@ -12,7 +12,6 @@
         android:layout_height="50dp"
         android:layout_margin="8dp"
         android:gravity="center"
-        android:background="@drawable/search_view_bg"
         android:hint="@string/search_here"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"

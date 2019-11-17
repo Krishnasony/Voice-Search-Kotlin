@@ -10,14 +10,12 @@ import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatEditText
 import com.example.voicesearch.R
 
-class SearchView : AppCompatEditText {
+class SearchView : androidx.appcompat.widget.AppCompatEditText {
 
     constructor(context: Context) : super(context) {
         initView()
@@ -37,7 +35,7 @@ class SearchView : AppCompatEditText {
         this.isLongClickable = false
 
         this.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search_accent, 0,0 , 0)
-        this.hint = "Search"
+        this.hint = "Search Here ..."
         this.setPadding(
             getPx(context, 16),
             getPx(context, 16),
@@ -91,12 +89,12 @@ class SearchView : AppCompatEditText {
         })
     }
 
-    private fun getPx(dp: Int): Int =
-        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), context.resources.displayMetrics).toInt()
+    private fun getPx(): Int =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40.toFloat(), context.resources.displayMetrics).toInt()
 
-    private var onSearchButtonClickListener: View.OnClickListener? = null
+    private var onSearchButtonClickListener: OnClickListener? = null
 
-    fun setOnSearchButtonClickListener(onClearButtonClickListener: View.OnClickListener) {
+    fun setOnSearchButtonClickListener(onClearButtonClickListener: OnClickListener) {
         this.onSearchButtonClickListener = onClearButtonClickListener
     }
 
@@ -110,7 +108,7 @@ class SearchView : AppCompatEditText {
 
     private val onTouchListener = OnTouchListener { _, event ->
         if (event?.action == MotionEvent.ACTION_UP) {
-            if (this@SearchView.width - event.x < getPx(40)) {
+            if (this@SearchView.width - event.x < getPx()) {
                 if (onSearchButtonClickListener != null) {
                     hideKeyboard(context = context)
                     this@SearchView.clearFocus()
