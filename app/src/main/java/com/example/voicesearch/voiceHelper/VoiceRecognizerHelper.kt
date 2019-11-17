@@ -47,7 +47,7 @@ class VoiceRecognizerHelper(
 
     private fun sendBroadcastForLanguageDetails(context: Context) {
         Log.d(TAG, " >> Sending broadcast for language details")
-        val detailsIntent = Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS)
+//        val detailsIntent = Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS)
         context.sendOrderedBroadcast(
             RecognizerIntent.getVoiceDetailsIntent(context),
             null,
